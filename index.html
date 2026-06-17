@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PÁN KEBAB — Zahradnícka 26 | Hand Made Kebab</title>
+<meta name="description" content="PÁN KEBAB — čerstvý kebab z Zahradníckej 26. Düriim, Döner, Box, Tanier a domáca baklava. Kuriacie alebo teľacie mäso, vždy čerstvo pripravené.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container">
+    <span class="status">
+      <span id="status-dot" class="status-dot"></span>
+      <span id="status-label">Načítavam otváracie hodiny…</span>
+    </span>
+    <a href="tel:+421944302864">📞 +421 944 302 864</a>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="container">
+    <img class="hero-mascot" src="assets/mascot.svg" alt="PÁN KEBAB postavička" width="168" height="168">
+    <h1>PÁN KEBAB</h1>
+    <span class="tagline">Hand Made Kebab</span>
+    <p class="lede">Čerstvé mäso, čerstvo pečená žemľa, žiadne kompromisy. Pripravujeme každý kebab na mieru — vy si vyberiete mäso, o chuť sa postaráme my.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="#menu">Pozrieť menu</a>
+      <a class="btn btn-ghost" href="#kontakt">Kde nás nájdete</a>
+    </div>
+  </div>
+  <div class="tear" aria-hidden="true">
+    <svg viewBox="0 0 1200 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path style="fill:var(--cream)" d="M0,12 L40,44 L80,12 L120,44 L160,12 L200,44 L240,12 L280,44 L320,12 L360,44 L400,12 L440,44 L480,12 L520,44 L560,12 L600,44 L640,12 L680,44 L720,12 L760,44 L800,12 L840,44 L880,12 L920,44 L960,12 L1000,44 L1040,12 L1080,44 L1120,12 L1160,44 L1200,12 L1200,60 L0,60 Z"/>
+    </svg>
+  </div>
+</header>
+
+<main>
+  <section class="section" id="menu">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Ponuka</span>
+        <h2>Kebab</h2>
+        <p>Pri každom kebabe si vyberáte kuriacie alebo teľacie mäso.</p>
+      </div>
+      <div class="menu-grid" id="menu-grid" aria-live="polite">
+        <noscript><p>Pre zobrazenie menu si, prosím, povoľte JavaScript.</p></noscript>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="kontakt" style="background:#fff;">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Nájdete nás</span>
+        <h2>Kontakt &amp; otváracie hodiny</h2>
+      </div>
+      <div class="contact-grid">
+        <div>
+          <div class="board">
+            <h3>Otváracie hodiny</h3>
+            <div id="hours-board"></div>
+          </div>
+          <div class="contact-list">
+            <div class="contact-item">
+              <span class="ico" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              </span>
+              <span>Zahradnícka 26<br>Bratislava</span>
+            </div>
+            <div class="contact-item">
+              <span class="ico" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.69 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.56 2.81.69A2 2 0 0 1 22 16.92Z"/></svg>
+              </span>
+              <a href="tel:+421944302864">+421 944 302 864</a>
+            </div>
+          </div>
+        </div>
+        <div class="map-wrap">
+          <iframe
+            src="https://www.google.com/maps?q=Zahradn%C3%ADcka%2026%2C%20Bratislava%2C%20Slovensko&output=embed"
+            title="Mapa — PÁN KEBAB, Zahradnícka 26"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <p>© <span id="year"></span> PÁN KEBAB · Zahradnícka 26, Bratislava</p>
+    <p class="admin-link"><a href="/admin/">Administrácia</a></p>
+  </div>
+</footer>
+
+<script src="js/menu-data.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

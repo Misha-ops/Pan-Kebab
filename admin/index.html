@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administrácia — PÁN KEBAB</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin">
+
+<header class="admin-bar">
+  <div class="container">
+    <h1>PÁN KEBAB · Administrácia</h1>
+    <a class="back" href="/">← Späť na web</a>
+  </div>
+</header>
+
+<div class="admin-wrap">
+
+  <section id="login-view">
+    <div class="login-card">
+      <h2>Prihlásenie</h2>
+      <p>Zadajte heslo pre úpravu menu.</p>
+      <div id="login-msg" class="msg error"></div>
+      <form id="login-form">
+        <div class="field">
+          <label for="password">Heslo</label>
+          <input type="password" id="password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Prihlásiť sa</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="dashboard-view" style="display:none;">
+    <div class="top-actions">
+      <button id="logout-btn" class="btn btn-sm" style="background:#fff;color:var(--char);border:2px solid #EADFD0;">Odhlásiť sa</button>
+    </div>
+    <div id="dash-msg" class="msg"></div>
+    <div id="items-list"><p>Načítavam menu…</p></div>
+  </section>
+
+</div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

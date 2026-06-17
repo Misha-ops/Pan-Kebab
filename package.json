@@ -1,0 +1,17 @@
+{
+  "name": "pan-kebab",
+  "version": "1.0.0",
+  "description": "PÁN KEBAB — stránka s menu a admin panelom (Netlify Functions + Supabase).",
+  "private": true,
+  "scripts": {
+    "hash-password": "node scripts/hash-password.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3"
+  }
+}

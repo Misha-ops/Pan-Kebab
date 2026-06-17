@@ -1,0 +1,10 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Düriim Kebab - foto skoro">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE3CE"/><stop offset="1" stop-color="#FFD3B0"/></linearGradient></defs>
+  <rect width="400" height="300" fill="url(#g)"/>
+  <g transform="translate(200,140)" stroke="#921912" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-90 -10 C-90 -45 -45 -55 0 -55 C45 -55 90 -45 90 -10 L75 55 C72 70 60 75 45 75 L-45 75 C-60 75 -72 70 -75 55 Z"/>
+    <path d="M-60 -25 C-30 -35 30 -35 60 -25" opacity=".55"/>
+    <path d="M-65 0 H65" opacity=".4"/>
+    <path d="M-62 22 H62" opacity=".4"/>
+  </g>
+</svg>
