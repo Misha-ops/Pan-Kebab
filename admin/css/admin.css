@@ -133,3 +133,41 @@ body.admin {
   justify-content: flex-end;
   margin-bottom: 18px;
 }
+
+/* ---- Add item ---- */
+.add-item-block {
+  margin-bottom: 24px;
+}
+.add-item-block #add-form {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  margin-top: 12px;
+}
+
+/* ---- Reorder ---- */
+.reorder-btns {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  justify-content: center;
+}
+.btn-icon {
+  width: 34px;
+  height: 30px;
+  border-radius: 8px;
+  border: 2px solid #EADFD0;
+  background: var(--cream-2);
+  color: var(--char);
+  font-size: .85rem;
+  cursor: pointer;
+}
+.btn-icon:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+.btn-icon:not(:disabled):hover {
+  background: #fff;
+  border-color: var(--mustard);
+}

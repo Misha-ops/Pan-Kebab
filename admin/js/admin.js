@@ -3,6 +3,7 @@
   "use strict";
 
   var TOKEN_KEY = "pk_admin_token";
+  var currentItems = [];
 
   function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
   function setToken(t) { sessionStorage.setItem(TOKEN_KEY, t); }
@@ -20,6 +21,16 @@
     if (type === "success") {
       setTimeout(function () { el.className = "msg"; }, 2500);
     }
+  }
+
+  function authHeaders() {
+    return { "Content-Type": "application/json", "Authorization": "Bearer " + getToken() };
+  }
+
+  function escapeHtml(s) {
+    return String(s || "").replace(/[&<>"']/g, function (c) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+    });
   }
 
   // ---- Login ------------------------------------------------------------
@@ -68,25 +79,26 @@
     fetch("/.netlify/functions/get-menu")
       .then(function (res) { return res.json(); })
       .then(function (data) {
-        var items = (data.items || []).slice().sort(function (a, b) {
+        currentItems = (data.items || []).slice().sort(function (a, b) {
           return (a.sort_order || 0) - (b.sort_order || 0);
         });
-        list.innerHTML = items.map(itemTemplate).join("");
-        items.forEach(wireItem);
+        renderItems();
       })
       .catch(function () {
         list.innerHTML = '<p>Menu sa nepodarilo načítať. Skontrolujte, či sú nastavené Supabase premenné.</p>';
       });
   }
 
-  function escapeHtml(s) {
-    return String(s || "").replace(/[&<>"']/g, function (c) {
-      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
-    });
+  function renderItems() {
+    var list = document.getElementById("items-list");
+    list.innerHTML = currentItems.map(itemTemplate).join("");
+    currentItems.forEach(wireItem);
   }
 
-  function itemTemplate(item) {
+  function itemTemplate(item, index) {
     var phTag = item.is_placeholder ? '<span class="ph-tag">Foto skoro tu</span>' : "";
+    var isFirst = index === 0;
+    var isLast = index === currentItems.length - 1;
     return (
       '<div class="item-editor" data-id="' + item.id + '">' +
         '<div>' +
@@ -96,6 +108,10 @@
           "</div>" +
           '<div class="item-photo-actions">' +
             '<input type="file" accept="image/png,image/jpeg,image/webp" class="js-photo-input">' +
+          "</div>" +
+          '<div class="reorder-btns">' +
+            '<button class="btn-icon js-up" title="Posunúť hore"' + (isFirst ? " disabled" : "") + '>▲</button>' +
+            '<button class="btn-icon js-down" title="Posunúť dole"' + (isLast ? " disabled" : "") + '>▼</button>' +
           "</div>" +
         "</div>" +
         '<div class="item-fields">' +
@@ -108,6 +124,8 @@
           '<div class="field"><label>Popis</label><textarea class="js-desc">' + escapeHtml(item.description) + "</textarea></div>" +
           '<div class="item-footer">' +
             '<span class="item-status js-status"></span>' +
+            '<span style="flex:1"></span>' +
+            '<button class="btn btn-sm js-delete" style="background:#fff;color:#921912;border:2px solid #FCE4E1;">Vymazať</button>' +
             '<button class="btn btn-primary btn-sm js-save">Uložiť</button>' +
           "</div>" +
         "</div>" +
@@ -115,8 +133,15 @@
     );
   }
 
-  function authHeaders() {
-    return { "Content-Type": "application/json", "Authorization": "Bearer " + getToken() };
+  function persistOrder() {
+    var ids = currentItems.map(function (it) { return it.id; });
+    fetch("/.netlify/functions/reorder-items", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ order: ids })
+    }).then(function (res) {
+      if (res.status === 401) bounceToLogin("Prihlásenie vypršalo. Prihláste sa znova.");
+    }).catch(function () { /* will resync on next loadItems() */ });
   }
 
   function wireItem(item) {
@@ -153,6 +178,31 @@
         .catch(function () { statusEl.textContent = "Server neodpovedá."; });
     });
 
+    row.querySelector(".js-delete").addEventListener("click", function () {
+      if (!window.confirm('Naozaj vymazať "' + item.name + '" z menu? Toto sa nedá vrátiť späť.')) return;
+      statusEl.textContent = "Vymazávam…";
+      fetch("/.netlify/functions/delete-item", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ id: item.id })
+      })
+        .then(function (res) {
+          if (res.status === 401) { bounceToLogin("Prihlásenie vypršalo. Prihláste sa znova."); return null; }
+          return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+        })
+        .then(function (result) {
+          if (!result) return;
+          if (!result.ok) { statusEl.textContent = result.data.error || "Vymazanie zlyhalo."; return; }
+          loadItems();
+        })
+        .catch(function () { statusEl.textContent = "Server neodpovedá."; });
+    });
+
+    var upBtn = row.querySelector(".js-up");
+    var downBtn = row.querySelector(".js-down");
+    if (upBtn) upBtn.addEventListener("click", function () { moveItem(item.id, -1); });
+    if (downBtn) downBtn.addEventListener("click", function () { moveItem(item.id, 1); });
+
     row.querySelector(".js-photo-input").addEventListener("change", function (e) {
       var file = e.target.files[0];
       if (!file) return;
@@ -184,9 +234,66 @@
     });
   }
 
+  function moveItem(id, direction) {
+    var idx = currentItems.findIndex(function (it) { return it.id === id; });
+    var swapWith = idx + direction;
+    if (idx < 0 || swapWith < 0 || swapWith >= currentItems.length) return;
+    var tmp = currentItems[idx];
+    currentItems[idx] = currentItems[swapWith];
+    currentItems[swapWith] = tmp;
+    renderItems();
+    persistOrder();
+  }
+
+  // ---- Add new item -------------------------------------------------------
+  function wireAddForm() {
+    var toggleBtn = document.getElementById("add-toggle-btn");
+    var form = document.getElementById("add-form");
+    var msg = document.getElementById("add-msg");
+
+    toggleBtn.addEventListener("click", function () {
+      var hidden = form.style.display === "none";
+      form.style.display = hidden ? "" : "none";
+      toggleBtn.textContent = hidden ? "Zrušiť" : "+ Pridať položku";
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var payload = {
+        name: document.getElementById("new-name").value.trim(),
+        price: document.getElementById("new-price").value,
+        meat_options: document.getElementById("new-meat").value.trim() || null,
+        description: document.getElementById("new-desc").value.trim(),
+        category: document.getElementById("new-category").value.trim() || "Kebab"
+      };
+      if (!payload.name) { flash(msg, "Zadajte názov.", "error"); return; }
+
+      fetch("/.netlify/functions/add-item", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(payload)
+      })
+        .then(function (res) {
+          if (res.status === 401) { bounceToLogin("Prihlásenie vypršalo. Prihláste sa znova."); return null; }
+          return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+        })
+        .then(function (result) {
+          if (!result) return;
+          if (!result.ok) { flash(msg, result.data.error || "Pridanie sa nepodarilo.", "error"); return; }
+          form.reset();
+          form.style.display = "none";
+          toggleBtn.textContent = "+ Pridať položku";
+          msg.className = "msg";
+          loadItems();
+        })
+        .catch(function () { flash(msg, "Server neodpovedá.", "error"); });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("login-form").addEventListener("submit", handleLogin);
     document.getElementById("logout-btn").addEventListener("click", handleLogout);
+    wireAddForm();
 
     if (getToken()) {
       showView("dashboard-view");
