@@ -120,7 +120,7 @@ textarea:focus-visible {
   z-index: 2;
 }
 .hero-mascot {
-  width: clamp(150px, 38vw, 220px);
+  width: clamp(160px, 44vw, 230px);
   height: auto;
   filter: drop-shadow(0 12px 18px rgba(0,0,0,.25));
   animation: mascot-in .7s cubic-bezier(.2,.9,.25,1.2) both;
