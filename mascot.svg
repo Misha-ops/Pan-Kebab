@@ -1,0 +1,32 @@
+<svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PÁN KEBAB postavička">
+  <!-- steam -->
+  <path d="M85 28c-6-10 4-14 0-24" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/>
+  <path d="M110 24c-6-10 4-16 0-24" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/>
+  <path d="M135 28c-6-10 4-14 0-24" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/>
+
+  <!-- lettuce peeking out -->
+  <path d="M68 58c4-14 18-18 24-8 4-12 20-14 26-2 6-12 22-10 26 2 4-12 20-10 22 4" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- wrap body -->
+  <path d="M58 78 Q56 40 110 38 Q164 40 162 78 L172 178 Q174 196 154 196 L66 196 Q46 196 48 178 Z"
+        fill="#FFB627" fill-opacity=".18" stroke="#fff" stroke-width="7" stroke-linejoin="round"/>
+
+  <!-- grill stripes -->
+  <path d="M64 110 H156" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".55"/>
+  <path d="M62 132 H158" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".55"/>
+
+  <!-- face -->
+  <circle cx="92" cy="96" r="9" fill="#fff"/>
+  <circle cx="128" cy="96" r="9" fill="#fff"/>
+  <circle cx="95" cy="93" r="3" fill="#2B1810"/>
+  <circle cx="131" cy="93" r="3" fill="#2B1810"/>
+  <path d="M92 116 Q110 132 128 116" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="76" cy="112" r="7" fill="#fff" opacity=".35"/>
+  <circle cx="144" cy="112" r="7" fill="#fff" opacity=".35"/>
+
+  <!-- arms -->
+  <path d="M52 130 Q30 132 26 152" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+  <path d="M168 130 Q190 132 194 152" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="24" cy="158" r="8" fill="none" stroke="#fff" stroke-width="6"/>
+  <circle cx="196" cy="158" r="8" fill="none" stroke="#fff" stroke-width="6"/>
+</svg>

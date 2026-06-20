@@ -1,0 +1,10 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Kebab Box - foto skoro">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE3CE"/><stop offset="1" stop-color="#FFD3B0"/></linearGradient></defs>
+  <rect width="400" height="300" fill="url(#g)"/>
+  <g transform="translate(200,155)" stroke="#921912" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-95 -30 L0 -55 L95 -30 L95 45 L0 65 L-95 45 Z"/>
+    <path d="M-95 -30 L0 -10 L95 -30" opacity=".55"/>
+    <path d="M0 -10 L0 65" opacity=".4"/>
+    <path d="M-60 5 V35 M-40 0 V40 M-20 5 V35" opacity=".5"/>
+  </g>
+</svg>

@@ -1,0 +1,11 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Döner Kebab - foto skoro">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE3CE"/><stop offset="1" stop-color="#FFD3B0"/></linearGradient></defs>
+  <rect width="400" height="300" fill="url(#g)"/>
+  <g transform="translate(200,150)" stroke="#921912" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-95 10 C-95 -10 -70 -22 0 -22 C70 -22 95 -10 95 10 C95 30 70 42 0 42 C-70 42 -95 30 -95 10 Z"/>
+    <path d="M-60 -8 Q-30 -20 0 -8 Q30 -20 60 -8" opacity=".6"/>
+    <path d="M-55 18 Q0 30 55 18" opacity=".4"/>
+    <circle cx="-35" cy="6" r="5" fill="#921912" stroke="none" opacity=".5"/>
+    <circle cx="20" cy="10" r="5" fill="#921912" stroke="none" opacity=".5"/>
+  </g>
+</svg>
