@@ -27,6 +27,43 @@
     return { "Content-Type": "application/json", "Authorization": "Bearer " + getToken() };
   }
 
+  // Phone photos are often 3-10 MB — way past what Netlify's function
+  // payload limit allows once base64-encoded (~4.5 MB effective). Shrink
+  // to a sensible web size client-side before ever sending it.
+  function resizeImageToJpeg(file, maxDim, quality) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var w = img.naturalWidth, h = img.naturalHeight;
+        if (w > maxDim || h > maxDim) {
+          if (w >= h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+          else { w = Math.round((w * maxDim) / h); h = maxDim; }
+        }
+        var canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        canvas.toBlob(function (blob) {
+          if (!blob) { reject(new Error("canvas export failed")); return; }
+          resolve(blob);
+        }, "image/jpeg", quality);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error("image load failed")); };
+      img.src = url;
+    });
+  }
+
+  function blobToBase64(blob) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () { resolve(reader.result.split(",")[1]); };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
   function escapeHtml(s) {
     return String(s || "").replace(/[&<>"']/g, function (c) {
       return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
@@ -55,6 +92,7 @@
         document.getElementById("password").value = "";
         showView("dashboard-view");
         loadItems();
+        loadVisitStats();
       })
       .catch(function () {
         flash(msg, "Server neodpovedá. Skúste znova.", "error");
@@ -135,13 +173,29 @@
 
   function persistOrder() {
     var ids = currentItems.map(function (it) { return it.id; });
+    var dashMsg = document.getElementById("dash-msg");
     fetch("/.netlify/functions/reorder-items", {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({ order: ids })
-    }).then(function (res) {
-      if (res.status === 401) bounceToLogin("Prihlásenie vypršalo. Prihláste sa znova.");
-    }).catch(function () { /* will resync on next loadItems() */ });
+    })
+      .then(function (res) {
+        if (res.status === 401) { bounceToLogin("Prihlásenie vypršalo. Prihláste sa znova."); return null; }
+        return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+      })
+      .then(function (result) {
+        if (!result) return;
+        if (!result.ok) {
+          flash(dashMsg, result.data.error || "Zmena poradia sa nepodarila.", "error");
+          loadItems(); // resync UI with what's actually saved on the server
+          return;
+        }
+        flash(dashMsg, "Poradie uložené ✓", "success");
+      })
+      .catch(function () {
+        flash(dashMsg, "Server neodpovedá, poradie sa možno neuložilo.", "error");
+        loadItems();
+      });
   }
 
   function wireItem(item) {
@@ -206,31 +260,40 @@
     row.querySelector(".js-photo-input").addEventListener("change", function (e) {
       var file = e.target.files[0];
       if (!file) return;
-      statusEl.textContent = "Nahrávam fotku…";
-      var reader = new FileReader();
-      reader.onload = function () {
-        var base64 = reader.result.split(",")[1];
-        fetch("/.netlify/functions/upload-image", {
-          method: "POST",
-          headers: authHeaders(),
-          body: JSON.stringify({ id: item.id, content_base64: base64, content_type: file.type })
+      if (!file.type || file.type.indexOf("image/") !== 0) {
+        statusEl.textContent = "Vyberte obrázok (jpg, png, webp).";
+        return;
+      }
+      statusEl.textContent = "Upravujem fotku…";
+
+      resizeImageToJpeg(file, 1200, 0.82)
+        .then(function (blob) {
+          statusEl.textContent = "Nahrávam fotku…";
+          return blobToBase64(blob);
         })
-          .then(function (res) {
-            if (res.status === 401) { bounceToLogin("Prihlásenie vypršalo. Prihláste sa znova."); return null; }
-            return res.json().then(function (data) { return { ok: res.ok, data: data }; });
-          })
-          .then(function (result) {
-            if (!result) return;
-            if (!result.ok) { statusEl.textContent = result.data.error || "Nahranie fotky zlyhalo."; return; }
-            row.querySelector(".item-photo img").src = result.data.item.image_url;
-            var phTag = row.querySelector(".ph-tag");
-            if (phTag) phTag.remove();
-            statusEl.textContent = "Fotka nahraná ✓";
-            setTimeout(function () { statusEl.textContent = ""; }, 2500);
-          })
-          .catch(function () { statusEl.textContent = "Server neodpovedá."; });
-      };
-      reader.readAsDataURL(file);
+        .then(function (base64) {
+          return fetch("/.netlify/functions/upload-image", {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({ id: item.id, content_base64: base64, content_type: "image/jpeg" })
+          });
+        })
+        .then(function (res) {
+          if (res.status === 401) { bounceToLogin("Prihlásenie vypršalo. Prihláste sa znova."); return null; }
+          return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+        })
+        .then(function (result) {
+          if (!result) return;
+          if (!result.ok) { statusEl.textContent = result.data.error || "Nahranie fotky zlyhalo."; return; }
+          row.querySelector(".item-photo img").src = result.data.item.image_url;
+          var phTag = row.querySelector(".ph-tag");
+          if (phTag) phTag.remove();
+          statusEl.textContent = "Fotka nahraná ✓";
+          setTimeout(function () { statusEl.textContent = ""; }, 2500);
+        })
+        .catch(function () {
+          statusEl.textContent = "Nepodarilo sa upraviť alebo odoslať fotku. Skúste inú fotku.";
+        });
     });
   }
 
@@ -290,6 +353,46 @@
     });
   }
 
+  // ---- Visit stats --------------------------------------------------------
+  function loadVisitStats() {
+    var chart = document.getElementById("stats-chart");
+    var totalEl = document.getElementById("stats-total");
+    fetch("/.netlify/functions/get-visit-stats?days=30", { headers: authHeaders() })
+      .then(function (res) {
+        if (res.status === 401) { bounceToLogin("Prihlásenie vypršalo. Prihláste sa znova."); return null; }
+        return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+      })
+      .then(function (result) {
+        if (!result) return;
+        if (!result.ok) { chart.innerHTML = "<p>Návštevnosť sa nepodarilo načítať.</p>"; return; }
+        renderVisitChart(result.data.days, result.data.total);
+        totalEl.textContent = result.data.total + " za 30 dní";
+      })
+      .catch(function () {
+        chart.innerHTML = "<p>Server neodpovedá.</p>";
+      });
+  }
+
+  function renderVisitChart(days, total) {
+    var chart = document.getElementById("stats-chart");
+    if (!days || days.length === 0) { chart.innerHTML = "<p>Zatiaľ žiadne dáta.</p>"; return; }
+    var max = Math.max.apply(null, days.map(function (d) { return d.count; })) || 1;
+    var todayStr = new Date().toISOString().slice(0, 10);
+
+    chart.innerHTML = days.map(function (d) {
+      var h = Math.max(2, Math.round((d.count / max) * 100));
+      var isToday = d.date === todayStr;
+      var dd = d.date.slice(8, 10);
+      var mm = d.date.slice(5, 7);
+      var title = dd + "." + mm + " — " + d.count;
+      return (
+        '<div class="stats-bar-wrap" title="' + title + '">' +
+          '<div class="stats-bar' + (isToday ? " today" : "") + '" style="height:' + h + '%"></div>' +
+        "</div>"
+      );
+    }).join("");
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("login-form").addEventListener("submit", handleLogin);
     document.getElementById("logout-btn").addEventListener("click", handleLogout);
@@ -298,6 +401,7 @@
     if (getToken()) {
       showView("dashboard-view");
       loadItems();
+      loadVisitStats();
     } else {
       showView("login-view");
     }

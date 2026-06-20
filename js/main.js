@@ -117,10 +117,18 @@
       });
   }
 
+  function trackVisit() {
+    // Silent, fire-and-forget — never blocks rendering, never surfaces errors.
+    // Only called from the public site (never from /admin), so admin's own
+    // visits never inflate the count.
+    fetch("/.netlify/functions/track-visit", { method: "POST" }).catch(function () {});
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     renderHoursBoard();
     renderStatus();
     loadMenu();
+    trackVisit();
     setInterval(renderStatus, 60000);
 
     var year = document.getElementById("year");

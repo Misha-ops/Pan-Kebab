@@ -7,7 +7,10 @@ const { getServiceClient } = require("./_supabase");
 const { requireAdmin } = require("./_auth");
 
 const BUCKET = "menu-images";
-const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+const MAX_BYTES = 4 * 1024 * 1024; // 4 MB raw — Netlify's function payload limit is 6 MB total,
+// and base64 encoding adds ~30% overhead, so anything bigger risks the request being
+// rejected before our own code even runs (the admin panel resizes photos before sending,
+// this is just a defensive backstop).
 const ALLOWED = {
   "image/jpeg": "jpg",
   "image/png": "png",

@@ -120,7 +120,7 @@ textarea:focus-visible {
   z-index: 2;
 }
 .hero-mascot {
-  width: clamp(160px, 44vw, 230px);
+  width: clamp(150px, 38vw, 220px);
   height: auto;
   filter: drop-shadow(0 12px 18px rgba(0,0,0,.25));
   animation: mascot-in .7s cubic-bezier(.2,.9,.25,1.2) both;
@@ -240,7 +240,7 @@ textarea:focus-visible {
 .card-media {
   position: relative;
   aspect-ratio: 4 / 3;
-  background: linear-gradient(160deg, #FF1116, #FF1116);
+  background: linear-gradient(160deg, #FFE3CE, #FFD3B0);
   overflow: hidden;
 }
 .card-media img { width: 100%; height: 100%; object-fit: cover; }

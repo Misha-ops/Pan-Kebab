@@ -30,15 +30,21 @@ exports.handler = async function (event) {
 
   try {
     const supabase = getServiceClient();
-    const rows = order.map(function (id, index) {
-      return { id: id, sort_order: index + 1, updated_at: new Date().toISOString() };
-    });
 
-    // Only existing rows are ever reordered, so the ON CONFLICT branch of
-    // this upsert is always taken — it updates just sort_order/updated_at
-    // and leaves every other column (name, price, photo, ...) untouched.
-    const { error } = await supabase.from("menu_items").upsert(rows, { onConflict: "id" });
-    if (error) throw error;
+    // Individual UPDATEs (not upsert!) — an upsert would try to construct
+    // a full new row for columns we don't send (name, price, ...), which
+    // violates their NOT NULL constraints. A plain UPDATE only touches the
+    // columns we name and leaves everything else on the existing row alone.
+    const results = await Promise.all(
+      order.map(function (id, index) {
+        return supabase
+          .from("menu_items")
+          .update({ sort_order: index + 1, updated_at: new Date().toISOString() })
+          .eq("id", id);
+      })
+    );
+    const failed = results.find(function (r) { return r.error; });
+    if (failed) throw failed.error;
 
     return {
       statusCode: 200,
